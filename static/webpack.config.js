@@ -6,6 +6,15 @@ module.exports = {
   output: {
     path:path.resolve(__dirname, "dist"),
   },
+  resolve: {
+    alias: {
+      components: path.resolve(__dirname, 'src/'),
+    },
+    extensions: ['.js', '.jsx'],
+    modules: [
+      path.join(__dirname, 'node_modules')
+    ]
+  },
   module: {
     rules: [
       {
