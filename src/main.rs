@@ -17,7 +17,7 @@ mod routes;
 mod tools;
 
 async fn index(_req: HttpRequest) -> Result<NamedFile> {
-    Ok(NamedFile::open("./static/index.html")?)
+    Ok(NamedFile::open("./static/dist/index.html")?)
 }
 
 #[actix_web::main]
@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
             ))
             .route("/", web::get().to(index))
             .configure(config_user)
-            .service(Files::new("/", "./static"))
+            .service(Files::new("/", "./static/dist/"))
     })
     .bind(format!("0.0.0.0:{}", PORT))?
     .run()
