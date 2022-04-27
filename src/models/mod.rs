@@ -1,4 +1,5 @@
+mod dose;
 mod session;
 mod user;
 
-pub use self::{session::*, user::*};
+pub use self::{dose::*, session::*, user::*};

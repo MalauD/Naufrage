@@ -3,9 +3,11 @@ use actix_identity::Identity;
 use actix_web::{
     dev::Payload, error::ErrorUnauthorized, web::Data, Error, FromRequest, HttpRequest,
 };
-use bson::DateTime;
+use chrono::serde::ts_milliseconds;
+use chrono::{DateTime, Utc};
 use futures::Future;
 use mongodb::bson::oid::ObjectId;
+use mongodb::bson::serde_helpers::chrono_datetime_as_bson_datetime;
 use ring::{digest, pbkdf2};
 use serde::{Deserialize, Serialize, Serializer};
 use std::{num::NonZeroU32, pin::Pin, sync::RwLock, u8};
@@ -24,7 +26,8 @@ pub struct UserInfoRegister {
     username: String,
     first_name: String,
     last_name: String,
-    birth_date: DateTime,
+    #[serde(with = "ts_milliseconds")]
+    birth_date: DateTime<Utc>,
     group: String,
     password: String,
 }
@@ -58,10 +61,16 @@ pub struct User {
     pub username: String,
     first_name: String,
     last_name: String,
-    birth_date: DateTime,
+    #[serde(with = "chrono_datetime_as_bson_datetime")]
+    birth_date: DateTime<Utc>,
     group: String,
     #[serde(with = "serde_bytes")]
     pub credential: Vec<u8>,
+    dose_taken: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rfid_card_id: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    barcode_card_id: Option<i32>,
 }
 
 fn serialize_option_oid_hex<S>(x: &Option<ObjectId>, s: S) -> Result<S::Ok, S::Error>
@@ -110,6 +119,9 @@ impl User {
             last_name: req.last_name.clone(),
             birth_date: req.birth_date.clone(),
             group: req.group.clone(),
+            dose_taken: 0,
+            rfid_card_id: todo!(),
+            barcode_card_id: todo!(),
         }
     }
 
@@ -120,6 +132,21 @@ impl User {
     /// Get a reference to the user's id.
     pub fn id(&self) -> Option<ObjectId> {
         self.id
+    }
+
+    /// Set the user's id.
+    pub fn set_id(&mut self, id: Option<ObjectId>) {
+        self.id = id;
+    }
+
+    /// Get the user's dose taken.
+    pub fn dose_taken(&self) -> i32 {
+        self.dose_taken
+    }
+
+    /// Get the user's birth date.
+    pub fn birth_date(&self) -> DateTime<Utc> {
+        self.birth_date
     }
 }
 

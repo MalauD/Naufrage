@@ -16,11 +16,10 @@ const App = () => (
             <Routes>
                 <Route
                     path="/"
-                    exact
                     element={<ProtectedRoute component={MainPage} />}
                 />
-                <Route path="/Login" element={<Login />} />
-                <Route path="/Register" element={<Register />} />
+                <Route path="/Connexion" element={<Login />} />
+                <Route path="/Inscription" element={<Register />} />
             </Routes>
         </HashRouter>
     </Suspense>

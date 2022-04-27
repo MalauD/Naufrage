@@ -41,7 +41,7 @@ class ProtectedRoute extends React.Component {
                 {connected ? (
                     <Component {...props} />
                 ) : gotResult ? (
-                    <Navigate to="/Login" replace />
+                    <Navigate to="/Connexion" replace />
                 ) : (
                     <div />
                 )}

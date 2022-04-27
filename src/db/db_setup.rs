@@ -15,19 +15,19 @@ pub async fn get_mongo() -> &'static MongoClient {
     if let Some(c) = MONGO.get() {
         return c;
     }
-    info!(target: "mop-rs::mongodb", "Connecting to database");
+    info!(target: "Naufrage::mongodb", "Connecting to database");
     let initializing_mutex = MONGO_INITIALIZED.get_or_init(|| tokio::sync::Mutex::new(false));
 
     let mut initialized = initializing_mutex.lock().await;
 
     if !*initialized {
         if let Ok(client_options) =
-            ClientOptions::parse("mongodb://localhost:27017/?appName=MopRs").await
+            ClientOptions::parse("mongodb://localhost:27017/?appName=Naufrage").await
         {
             if let Ok(client) = Client::with_options(client_options) {
                 if MONGO
                     .set(MongoClient {
-                        _database: client.database("MopRs"),
+                        _database: client.database("Naufrage"),
                     })
                     .is_ok()
                 {

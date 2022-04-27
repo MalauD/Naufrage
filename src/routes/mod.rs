@@ -1,3 +1,4 @@
+mod dose;
 mod user;
 
-pub use self::user::*;
+pub use self::{dose::*, user::*};

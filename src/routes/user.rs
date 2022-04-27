@@ -51,8 +51,9 @@ pub async fn register(
     if db.has_user_by_name(&user_mod).await? {
         return Ok(HttpResponse::Ok().json(json!({"success": false})));
     }
-    let user_saved = user_mod.clone();
-    db.save_user(user_mod).await?;
+    let mut user_saved = user_mod.clone();
+    let user_id = db.save_user(user_mod).await?;
+    user_saved.set_id(Some(user_id));
     id.remember(user.get_username());
     sessions
         .write()

@@ -5,7 +5,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -13,17 +12,27 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Background from "./../img/concert.jpg";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const theme = createTheme();
 
-export default function SignInSide() {
+export default function Login() {
+    const navigate = useNavigate();
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get("email"),
-            password: data.get("password"),
-        });
+        axios
+            .post("/User/Login", {
+                username: data.get("username"),
+                password: data.get("password"),
+            })
+            .then((res) => {
+                if (res.data.success) {
+                    navigate("/");
+                }
+            });
     };
 
     return (
@@ -68,7 +77,7 @@ export default function SignInSide() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            Sign in
+                            Se connecter
                         </Typography>
                         <Box
                             component="form"
@@ -80,10 +89,10 @@ export default function SignInSide() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="email"
-                                label="Email Address"
-                                name="email"
-                                autoComplete="email"
+                                id="username"
+                                label="Nom d'utilisateur"
+                                name="username"
+                                autoComplete="username"
                                 autoFocus
                             />
                             <TextField
@@ -91,19 +100,10 @@ export default function SignInSide() {
                                 required
                                 fullWidth
                                 name="password"
-                                label="Password"
+                                label="Mot de passe"
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        value="remember"
-                                        color="primary"
-                                    />
-                                }
-                                label="Remember me"
                             />
                             <Button
                                 type="submit"
@@ -111,17 +111,14 @@ export default function SignInSide() {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                Sign In
+                                Se connecter
                             </Button>
                             <Grid container>
-                                <Grid item xs>
-                                    <Link href="#" variant="body2">
-                                        Forgot password?
-                                    </Link>
-                                </Grid>
                                 <Grid item>
-                                    <Link href="#" variant="body2">
-                                        {"Don't have an account? Sign Up"}
+                                    <Link to="/Inscription" variant="body2">
+                                        {
+                                            "Vous n'avez pas encore de compte ? Faites en un dès maintenant"
+                                        }
                                     </Link>
                                 </Grid>
                             </Grid>
