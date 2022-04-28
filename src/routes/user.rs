@@ -5,6 +5,7 @@ use crate::{
 };
 use actix_identity::Identity;
 use actix_web::{web, HttpResponse, Responder};
+use serde::Deserialize;
 use serde_json::json;
 use std::sync::RwLock;
 
@@ -16,7 +17,8 @@ pub fn config_user(cfg: &mut web::ServiceConfig) {
             .route("/Login", web::post().to(login))
             .route("/Register", web::post().to(register))
             .route("/Logout", web::post().to(logout))
-            .route("/Me", web::get().to(get_account)),
+            .route("/Me", web::get().to(get_account))
+            .route("/Card", web::post().to(set_card)),
     );
 }
 
@@ -72,4 +74,16 @@ pub async fn get_account(user: User) -> impl Responder {
     let db = get_mongo().await;
     let u = db.get_user(&user.id().unwrap()).await.unwrap().unwrap();
     web::Json(json!({ "Account": u }))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SetCardQuery {
+    barcode_id: i32,
+}
+
+pub async fn set_card(user: User, query: web::Query<SetCardQuery>) -> UserResponse {
+    let db = get_mongo().await;
+    let barcode_card_id = query.barcode_id;
+    db.set_user_barcode(&user, barcode_card_id).await?;
+    Ok(HttpResponse::Ok().finish())
 }

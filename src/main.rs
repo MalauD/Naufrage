@@ -9,11 +9,16 @@ use log::info;
 use routes::config_user;
 use std::{fs, sync::RwLock};
 
-use crate::{models::Sessions, routes::config_dose};
+use crate::{
+    models::Sessions,
+    paypal::{get_paypal, PaypalClientConfig},
+    routes::{config_dose, config_order},
+};
 
 mod app_settings;
 mod db;
 mod models;
+mod paypal;
 mod routes;
 mod tools;
 
@@ -32,6 +37,13 @@ async fn main() -> std::io::Result<()> {
     builder = builder.add_source(File::new("Settings.toml", FileFormat::Toml));
     let settings = builder.build().unwrap();
 
+    let config_paypal = PaypalClientConfig::new(
+        paypal::PaypalEndpoints::Sandbox,
+        settings.get_string("paypal_client_id").unwrap(),
+        settings.get_string("paypal_app_secret").unwrap(),
+    );
+    let _ = get_paypal(Some(config_paypal)).await;
+
     HttpServer::new(move || {
         App::new()
             .app_data(sessions.clone())
@@ -46,6 +58,7 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::get().to(index))
             .configure(config_user)
             .configure(config_dose)
+            .configure(config_order)
             .service(Files::new("/", "./static/dist/"))
     })
     .bind(format!("0.0.0.0:{}", PORT))?

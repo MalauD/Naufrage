@@ -7,6 +7,9 @@ import ProtectedRoute from "./ProtectedRoute";
 import Login from "./Routes/Login";
 import Register from "./Routes/Register";
 import MainPage from "./Routes/MainPage";
+import CardEntryDashBoard from "./Routes/CardEntry";
+import Checkout from "./Routes/Checkout";
+import Status from "./Routes/Status";
 
 Axios.defaults.withCredentials = true;
 
@@ -17,6 +20,18 @@ const App = () => (
                 <Route
                     path="/"
                     element={<ProtectedRoute component={MainPage} />}
+                />
+                <Route
+                    path="/Carte"
+                    element={<ProtectedRoute component={CardEntryDashBoard} />}
+                />
+                <Route
+                    path="/Paiment"
+                    element={<ProtectedRoute component={Checkout} />}
+                />
+                <Route
+                    path="/Status"
+                    element={<ProtectedRoute component={Status} />}
                 />
                 <Route path="/Connexion" element={<Login />} />
                 <Route path="/Inscription" element={<Register />} />

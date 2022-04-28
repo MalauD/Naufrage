@@ -45,3 +45,27 @@ impl ResponseError for DoseError {
         HttpResponseBuilder::new(self.status_code()).finish()
     }
 }
+
+#[derive(Error, Debug)]
+pub enum OrderError {
+    #[error("Unauthorized")]
+    Unauthorized,
+    #[error("DatabaseError: something went wrong with mongodb")]
+    DatabaseError(#[from] mongodb::error::Error),
+    #[error("PaypalApiError: something went wrong with paypal")]
+    PaypalApiError(#[from] reqwest::Error),
+}
+
+impl ResponseError for OrderError {
+    fn status_code(&self) -> StatusCode {
+        match *self {
+            OrderError::Unauthorized => StatusCode::UNAUTHORIZED,
+            OrderError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            OrderError::PaypalApiError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        HttpResponseBuilder::new(self.status_code()).finish()
+    }
+}

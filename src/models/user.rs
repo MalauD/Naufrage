@@ -120,8 +120,8 @@ impl User {
             birth_date: req.birth_date.clone(),
             group: req.group.clone(),
             dose_taken: 0,
-            rfid_card_id: todo!(),
-            barcode_card_id: todo!(),
+            rfid_card_id: None,
+            barcode_card_id: None,
         }
     }
 

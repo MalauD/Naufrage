@@ -64,4 +64,15 @@ impl MongoClient {
         .await?;
         Ok(())
     }
+
+    pub async fn set_user_barcode(&self, user: &User, barcode_card: i32) -> Result<()> {
+        let coll = self._database.collection::<User>("User");
+        coll.update_one(
+            doc! {"_id": user.id()},
+            doc! {"$set" :{"barcode_card_id": barcode_card}},
+            None,
+        )
+        .await?;
+        Ok(())
+    }
 }

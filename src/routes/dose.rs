@@ -1,5 +1,6 @@
 use crate::{app_settings::AppSettings, db::get_mongo, models::Dose, tools::DoseError};
 use actix_web::{web, HttpResponse};
+use serde::Deserialize;
 
 type DoseResponse = Result<HttpResponse, DoseError>;
 
@@ -10,9 +11,14 @@ pub fn config_dose(cfg: &mut web::ServiceConfig) {
     ));
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ReduceDoseQuery {
+    token: i32,
+}
+
 pub async fn reduce_dose(
     path: web::Path<(i32, u32)>,
-    web::Query(token): web::Query<i32>,
+    query: web::Query<ReduceDoseQuery>,
     settings: web::Data<AppSettings>,
 ) -> DoseResponse {
     let db = get_mongo().await;
