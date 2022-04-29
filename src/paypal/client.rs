@@ -1,8 +1,10 @@
 use base64::encode;
+use chrono::{DateTime, Utc};
 use log::info;
 use once_cell::sync::OnceCell;
 use reqwest::{Client, Result};
 use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
 use tokio::sync::Mutex;
 
 pub enum PaypalEndpoints {
@@ -71,6 +73,45 @@ struct PaypalAccesToken(String);
 
 pub struct PaypalClientToken(pub String);
 
+#[derive(Deserialize, Serialize)]
+pub struct PaypalAmount {
+    pub value: String,
+    pub currency_code: String,
+}
+
+impl PaypalAmount {
+    pub fn new(value: String, currency_code: String) -> Self {
+        Self {
+            value,
+            currency_code,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct PaypalOrder {
+    pub create_time: Option<DateTime<Utc>>,
+    pub id: String,
+    pub status: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct PaypalOrderId(pub String);
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct PaypalCaptureData {
+    pub create_time: Option<DateTime<Utc>>,
+    pub id: String,
+    pub status: String,
+    pub update_time: Option<DateTime<Utc>>,
+    pub payer: PaypalPayer,
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct PaypalPayer {
+    pub payer_id: String,
+}
+
 impl PaypalClient {
     pub fn new(config: PaypalClientConfig) -> Self {
         let base_url = match config.mode {
@@ -120,5 +161,46 @@ impl PaypalClient {
             .await?;
 
         Ok(PaypalClientToken(resp.client_token))
+    }
+
+    pub async fn create_order(&self, order: PaypalAmount) -> Result<PaypalOrder> {
+        let PaypalAccesToken(access_token) = self.generate_acces_token().await?;
+
+        let body = json!({
+            "intent": "CAPTURE",
+            "purchase_units": [{
+                "amount": order
+            }]
+        });
+
+        let resp = self
+            .http_client
+            .post(self.get_relative_url("/v2/checkout/orders"))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(resp)
+    }
+
+    pub async fn capture_payment(&self, order_id: PaypalOrderId) -> Result<PaypalCaptureData> {
+        let PaypalAccesToken(access_token) = self.generate_acces_token().await?;
+        let PaypalOrderId(order) = order_id;
+
+        let resp: PaypalCaptureData = self
+            .http_client
+            .post(self.get_relative_url(&format!("/v2/checkout/orders/{}/capture", order)))
+            .header("Authorization", format!("Bearer {}", access_token))
+            .header("Content-Type", "application/json")
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(resp)
     }
 }

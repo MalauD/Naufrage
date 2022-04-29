@@ -105,6 +105,9 @@ export default function DashboardContent(props) {
             if (user.barcode_card_id) {
                 completed[0] = true;
             }
+            if (user.has_paid) {
+                completed[1] = true;
+            }
         }
         return completed;
     };

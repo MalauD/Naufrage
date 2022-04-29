@@ -1,4 +1,8 @@
-use crate::{db::MongoClient, models::User, tools::UserError};
+use crate::{
+    db::MongoClient,
+    models::{Order, User},
+    tools::UserError,
+};
 use bson::oid::ObjectId;
 use chrono::{Datelike, Utc};
 use mongodb::{bson::doc, error::Result};
@@ -70,6 +74,28 @@ impl MongoClient {
         coll.update_one(
             doc! {"_id": user.id()},
             doc! {"$set" :{"barcode_card_id": barcode_card}},
+            None,
+        )
+        .await?;
+        Ok(())
+    }
+
+    pub async fn add_order(&self, user: &User, order: &Order) -> Result<()> {
+        let coll = self._database.collection::<User>("User");
+        coll.update_one(
+            doc! {"_id": user.id()},
+            doc! {"$addToSet" :{"orders": order.id()}},
+            None,
+        )
+        .await?;
+        Ok(())
+    }
+
+    pub async fn change_paid_state(&self, user: &User, new_state: bool) -> Result<()> {
+        let coll = self._database.collection::<User>("User");
+        coll.update_one(
+            doc! {"_id": user.id()},
+            doc! {"$set" :{"has_paid": new_state}},
             None,
         )
         .await?;
