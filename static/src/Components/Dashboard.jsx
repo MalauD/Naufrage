@@ -18,7 +18,7 @@ const drawerWidth = 240;
 
 const steps = [
     "Enregister sa carte de lycée",
-    "Payer",
+    "Paiement",
     "Verification du compte",
 ];
 

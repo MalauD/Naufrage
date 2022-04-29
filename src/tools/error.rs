@@ -1,4 +1,5 @@
 use actix_web::{http::StatusCode, HttpResponse, HttpResponseBuilder, ResponseError};
+use log::info;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -66,6 +67,17 @@ impl ResponseError for OrderError {
     }
 
     fn error_response(&self) -> HttpResponse {
+        #[cfg(debug_assertions)]
+        return match self {
+            OrderError::Unauthorized => HttpResponseBuilder::new(self.status_code()).finish(),
+            OrderError::DatabaseError(e) => {
+                HttpResponseBuilder::new(self.status_code()).body(format!("{:?}", e))
+            }
+            OrderError::PaypalApiError(e) => {
+                HttpResponseBuilder::new(self.status_code()).body(format!("{:?}", e))
+            }
+        };
+        #[cfg(not(debug_assertions))]
         HttpResponseBuilder::new(self.status_code()).finish()
     }
 }

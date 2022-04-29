@@ -1,3 +1,4 @@
+use base64::encode;
 use log::info;
 use once_cell::sync::OnceCell;
 use reqwest::{Client, Result};
@@ -84,13 +85,18 @@ impl PaypalClient {
         }
     }
 
+    fn get_relative_url(&self, rel_url: &str) -> String {
+        format!("{}{}", self.base_url, rel_url)
+    }
+
     async fn generate_acces_token(&self) -> Result<PaypalAccesToken> {
         let auth = format!("{}:{}", self.client_id, self.app_secret);
+
         let resp: AccessTokenReponse = self
             .http_client
-            .post("/v1/oauth2/token")
+            .post(self.get_relative_url("/v1/oauth2/token"))
             .body("grant_type=client_credentials")
-            .header("Authorization", format!("Basic {}", auth))
+            .header("Authorization", format!("Basic {}", encode(auth)))
             .send()
             .await?
             .json()
@@ -104,7 +110,7 @@ impl PaypalClient {
 
         let resp: ClientTokenReponse = self
             .http_client
-            .post("/v1/identity/generate-token")
+            .post(self.get_relative_url("/v1/identity/generate-token"))
             .header("Authorization", format!("Bearer {}", access_token))
             .header("Accept-Language", "en_US")
             .header("Content-Type", "application/json")

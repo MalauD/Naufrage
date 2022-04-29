@@ -2,6 +2,8 @@ import { Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import {
     PayPalHostedField,
     PayPalHostedFieldsProvider,
+    PayPalScriptProvider,
+    usePayPalHostedFields,
     usePayPalScriptReducer,
 } from "@paypal/react-paypal-js";
 import axios from "axios";
@@ -57,13 +59,14 @@ export default function Checkout() {
                         flexDirection: "column",
                     }}
                 >
-                    <Title>Paiment</Title>
+                    <Title>Paiement</Title>
                     {data_client_token ? (
                         <PayPalScriptProvider
                             options={{
                                 "client-id":
                                     "AWxcsaQgJcsp2GZpwfOQnKvm7wx93hmIMeAGty8L-Qjz2bu9LLAOUPkx0VWdXjpLgKDX_p-nBxxAV6Bn",
                                 "data-client-token": data_client_token,
+                                components: "hosted-fields",
                             }}
                         >
                             <CheckoutField />
@@ -78,8 +81,8 @@ export default function Checkout() {
 }
 function CheckoutField() {
     const [{ isPending }] = usePayPalScriptReducer();
-    if(isPending) {
-        return <LinearProgress />
+    if (isPending) {
+        return <LinearProgress />;
     }
     return (
         <PayPalHostedFieldsProvider
@@ -92,6 +95,7 @@ function CheckoutField() {
                         // Handle any error
                     });
             }}
+            notEligibleError={<h1>Not eligible !</h1>}
         >
             <PayPalHostedField
                 id="card-number"
