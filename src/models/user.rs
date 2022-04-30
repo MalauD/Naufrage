@@ -73,6 +73,7 @@ pub struct User {
     barcode_card_id: Option<i32>,
     orders: Vec<String>,
     has_paid: bool,
+    verified: bool,
 }
 
 fn serialize_option_oid_hex<S>(x: &Option<ObjectId>, s: S) -> Result<S::Ok, S::Error>
@@ -126,6 +127,7 @@ impl User {
             barcode_card_id: None,
             orders: Vec::new(),
             has_paid: false,
+            verified: false,
         }
     }
 

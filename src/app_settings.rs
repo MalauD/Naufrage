@@ -16,6 +16,7 @@ pub struct AppSettings {
     pub paypal_production: bool,
     pub db_url: String,
     pub db_name: String,
+    pub entry_cost: String,
     pub port: u16,
     pub cert: String,
     pub key: String,

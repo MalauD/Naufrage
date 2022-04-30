@@ -24,7 +24,7 @@ function StatusTable({ user }) {
         { name: "Paiment de l'entrée", status: user.has_paid },
         {
             name: "Vérification du compte par les organisateurs",
-            status: user.verified !== undefined,
+            status: user.verified === true,
         },
     ];
 

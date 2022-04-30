@@ -1,4 +1,5 @@
 use crate::{
+    app_settings::AppSettings,
     db::get_mongo,
     models::{Order, User},
     paypal::{get_paypal, PaypalAmount, PaypalClientToken, PaypalOrderId},
@@ -26,12 +27,15 @@ pub async fn get_client_token() -> OrderResponse {
     Ok(HttpResponse::Ok().json(json!({ "client_token": tok })))
 }
 
-pub async fn create_order(user: User) -> OrderResponse {
+pub async fn create_order(user: User, settings: web::Data<AppSettings>) -> OrderResponse {
     let db = get_mongo(None).await;
     let paypal = get_paypal(None).await;
 
     let order = paypal
-        .create_order(PaypalAmount::new("10.00".to_string(), "EUR".to_string()))
+        .create_order(PaypalAmount::new(
+            settings.entry_cost.clone(),
+            "EUR".to_string(),
+        ))
         .await?;
 
     let db_order = Order::new(user.id().unwrap(), order.clone());

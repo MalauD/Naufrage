@@ -1,4 +1,5 @@
 import {
+    Alert,
     Badge,
     Card,
     CardContent,
@@ -79,7 +80,7 @@ function ProductCard({ has_paid }) {
                         color="text.secondary"
                         component="div"
                     >
-                        Prix: 10€
+                        Prix: 14€
                     </Typography>
                 </CardContent>
                 <Box
@@ -144,28 +145,43 @@ function Checkout({ user }) {
     );
 }
 function CheckoutField() {
+    const [error, setError] = React.useState(null);
+    const [order_id, setOrderId] = React.useState(null);
     const navigate = useNavigate();
     const [{ isPending }] = usePayPalScriptReducer();
     if (isPending) {
         return <LinearProgress />;
     }
     return (
-        <PayPalButtons
-            sx={{ p: 2 }}
-            disabled={false}
-            fundingSource={undefined}
-            createOrder={(data, actions) => {
-                return axios.post("/Order/Create").then((res) => res.data.id);
-            }}
-            onApprove={(data, actions) => {
-                barcode_card_id;
-                return axios
-                    .post(`/Order/Capture/${data.orderID}`)
-                    .then((res) => {
-                        navigate("/Statut");
+        <>
+            <PayPalButtons
+                sx={{ p: 2 }}
+                disabled={false}
+                fundingSource={undefined}
+                createOrder={(data, actions) => {
+                    return axios.post("/Order/Create").then((res) => {
+                        setOrderId(res.data.id);
+                        return res.data.id;
                     });
-            }}
-        />
+                }}
+                onApprove={(data, actions) => {
+                    return axios
+                        .post(`/Order/Capture/${data.orderID}`)
+                        .then((res) => {
+                            navigate("/Statut");
+                        });
+                }}
+                onShippingChange={() => {}}
+                onError={(err) => {
+                    setError(err);
+                }}
+            />
+            {error ? (
+                <Alert severity="warning">
+                    Erreur lors du paiement. Numéro de commande: {order_id}
+                </Alert>
+            ) : null}
+        </>
     );
 }
 
