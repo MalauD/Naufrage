@@ -30,7 +30,7 @@ const App = () => (
                     element={<ProtectedRoute component={Checkout} />}
                 />
                 <Route
-                    path="/Status"
+                    path="/Statut"
                     element={<ProtectedRoute component={Status} />}
                 />
                 <Route path="/Connexion" element={<Login />} />

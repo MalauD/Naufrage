@@ -162,7 +162,7 @@ function CheckoutField() {
                 return axios
                     .post(`/Order/Capture/${data.orderID}`)
                     .then((res) => {
-                        navigate("/Status");
+                        navigate("/Statut");
                     });
             }}
         />

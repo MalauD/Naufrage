@@ -10,9 +10,10 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Title from "./Title";
-import { Step, StepButton, Stepper } from "@mui/material";
+import { IconButton, Step, StepButton, Stepper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 240;
 
@@ -22,7 +23,7 @@ const steps = [
     "Verification du compte",
 ];
 
-const steps_url = ["/Carte", "/Paiment", "/Status"];
+const steps_url = ["/Carte", "/Paiment", "/Statut"];
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== "open",
@@ -112,6 +113,10 @@ export default function DashboardContent(props) {
         return completed;
     };
 
+    const logout = () => {
+        axios.post("/User/Logout").then(() => window.location.replace("/"));
+    };
+
     return (
         <ThemeProvider theme={mdTheme}>
             <Box sx={{ display: "flex" }}>
@@ -138,6 +143,13 @@ export default function DashboardContent(props) {
                         >
                             Bal des prépas 2022
                         </Typography>
+                        <IconButton
+                            component="span"
+                            color="inherit"
+                            onClick={logout}
+                        >
+                            <LogoutIcon />
+                        </IconButton>
                     </Toolbar>
                 </AppBar>
                 <Box
