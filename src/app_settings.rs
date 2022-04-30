@@ -1,14 +1,32 @@
+use serde::Deserialize;
+
+use crate::paypal::PaypalEndpoints;
+
+fn default_max_dose() -> u32 {
+    2
+}
+
+#[derive(Deserialize, Debug, Clone)]
+
 pub struct AppSettings {
-    max_dose: u32,
+    #[serde(default = "default_max_dose")]
+    pub max_dose: u32,
+    pub paypal_client_id: String,
+    pub paypal_app_secret: String,
+    pub paypal_production: bool,
+    pub db_url: String,
+    pub db_name: String,
+    pub port: u16,
+    pub cert: String,
+    pub key: String,
 }
 
 impl AppSettings {
-    pub fn new(max_dose: u32) -> Self {
-        Self { max_dose }
-    }
-
-    /// Get the app settings's max dose.
-    pub fn max_dose(&self) -> u32 {
-        self.max_dose
+    pub fn get_paypal_mode(&self) -> PaypalEndpoints {
+        if self.paypal_production {
+            PaypalEndpoints::Live
+        } else {
+            PaypalEndpoints::Sandbox
+        }
     }
 }

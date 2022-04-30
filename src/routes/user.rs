@@ -27,7 +27,7 @@ pub async fn login(
     user: web::Json<UserInfoLogin>,
     sessions: web::Data<RwLock<Sessions>>,
 ) -> UserResponse {
-    let db = get_mongo().await;
+    let db = get_mongo(None).await;
     if let Some(user_mod) = db.get_user_by_username(user.get_username()).await? {
         user_mod.login(&user)?;
         id.remember(user_mod.get_username());
@@ -47,7 +47,7 @@ pub async fn register(
     user: web::Json<UserInfoRegister>,
     sessions: web::Data<RwLock<Sessions>>,
 ) -> UserResponse {
-    let db = get_mongo().await;
+    let db = get_mongo(None).await;
     let user_mod = User::new(&user.0);
 
     if db.has_user_by_name(&user_mod).await? {
@@ -71,7 +71,7 @@ pub async fn logout(id: Identity) -> UserResponse {
 }
 
 pub async fn get_account(user: User) -> impl Responder {
-    let db = get_mongo().await;
+    let db = get_mongo(None).await;
     let u = db.get_user(&user.id().unwrap()).await.unwrap().unwrap();
     web::Json(json!({ "Account": u }))
 }
@@ -82,7 +82,7 @@ pub struct SetCardQuery {
 }
 
 pub async fn set_card(user: User, query: web::Query<SetCardQuery>) -> UserResponse {
-    let db = get_mongo().await;
+    let db = get_mongo(None).await;
     let barcode_card_id = query.barcode_id;
     db.set_user_barcode(&user, barcode_card_id).await?;
     Ok(HttpResponse::Ok().finish())

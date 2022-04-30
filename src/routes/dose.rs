@@ -21,12 +21,12 @@ pub async fn reduce_dose(
     query: web::Query<ReduceDoseQuery>,
     settings: web::Data<AppSettings>,
 ) -> DoseResponse {
-    let db = get_mongo().await;
+    let db = get_mongo(None).await;
     let (rfid_card_id, device_id) = path.into_inner();
 
     let (user, is_allowed_to_drink) = db.is_able_to_drink(rfid_card_id, 2).await?;
 
-    let dose_count = settings.max_dose();
+    let dose_count = settings.max_dose;
 
     if is_allowed_to_drink {
         let user = user.unwrap();

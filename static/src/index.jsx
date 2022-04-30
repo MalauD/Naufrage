@@ -19,7 +19,7 @@ const App = () => (
             <Routes>
                 <Route
                     path="/"
-                    element={<ProtectedRoute component={MainPage} />}
+                    element={<ProtectedRoute component={CardEntryDashBoard} />}
                 />
                 <Route
                     path="/Carte"

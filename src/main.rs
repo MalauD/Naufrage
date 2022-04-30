@@ -4,16 +4,19 @@ use actix_web::{
     web::{self, Data},
     App, HttpRequest, HttpServer, Result,
 };
-use config::{Config, File, FileFormat};
+use dotenv::dotenv;
 use log::info;
 use routes::config_user;
 use std::{fs, sync::RwLock};
 
 use crate::{
+    app_settings::AppSettings,
+    db::{get_mongo, MongoConfig},
     models::Sessions,
     paypal::{get_paypal, PaypalClientConfig},
     routes::{config_dose, config_order},
 };
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 mod app_settings;
 mod db;
@@ -28,28 +31,40 @@ async fn index(_req: HttpRequest) -> Result<NamedFile> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+
     env_logger::init();
     info!(target:"Naufrage::main","Starting Naufrage");
-    const PORT: i32 = 8080;
     let sessions: Data<RwLock<Sessions>> = Data::new(RwLock::new(Default::default()));
-    let mut builder = Config::builder();
-    builder = builder.set_default("max_dose", 2 as u64).unwrap();
-    builder = builder.add_source(File::new("Settings.toml", FileFormat::Toml));
-    let settings = builder.build().unwrap();
+
+    let config = envy::from_env::<AppSettings>().unwrap();
 
     let config_paypal = PaypalClientConfig::new(
-        paypal::PaypalEndpoints::Sandbox,
-        settings.get_string("paypal_client_id").unwrap(),
-        settings.get_string("paypal_app_secret").unwrap(),
+        config.clone().get_paypal_mode(),
+        config.clone().paypal_client_id.to_string(),
+        config.clone().paypal_app_secret.to_string(),
     );
     let _ = get_paypal(Some(config_paypal)).await;
+    let _ = get_mongo(Some(MongoConfig::new(
+        config.clone().db_url,
+        config.clone().db_name,
+    )))
+    .await;
+
+    let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+    builder
+        .set_private_key_file(config.clone().key, SslFiletype::PEM)
+        .unwrap();
+    builder
+        .set_certificate_chain_file(config.clone().cert)
+        .unwrap();
+
+    let port = config.clone().port;
 
     HttpServer::new(move || {
         App::new()
             .app_data(sessions.clone())
-            .app_data(Data::new(app_settings::AppSettings::new(
-                settings.get_int("max_dose").unwrap() as u32,
-            )))
+            .app_data(Data::new(config.clone()))
             .wrap(IdentityService::new(
                 CookieIdentityPolicy::new(&[0; 32])
                     .name("naufrage-id")
@@ -61,7 +76,7 @@ async fn main() -> std::io::Result<()> {
             .configure(config_order)
             .service(Files::new("/", "./static/dist/"))
     })
-    .bind(format!("0.0.0.0:{}", PORT))?
+    .bind_openssl(format!("0.0.0.0:{}", port), builder)?
     .run()
     .await
 }

@@ -11,7 +11,27 @@ pub struct MongoClient {
     pub(in crate::db) _database: Database,
 }
 
-pub async fn get_mongo() -> &'static MongoClient {
+pub struct MongoConfig {
+    pub url: String,
+    pub db_name: String,
+}
+
+impl MongoConfig {
+    pub fn new(url: String, db_name: String) -> Self {
+        Self { url, db_name }
+    }
+}
+
+impl Default for MongoConfig {
+    fn default() -> Self {
+        MongoConfig {
+            url: "mongodb://localhost:27017/?appName=Naufrage".to_string(),
+            db_name: "naufrage_debug".to_string(),
+        }
+    }
+}
+
+pub async fn get_mongo(config: Option<MongoConfig>) -> &'static MongoClient {
     if let Some(c) = MONGO.get() {
         return c;
     }
@@ -21,13 +41,12 @@ pub async fn get_mongo() -> &'static MongoClient {
     let mut initialized = initializing_mutex.lock().await;
 
     if !*initialized {
-        if let Ok(client_options) =
-            ClientOptions::parse("mongodb://localhost:27017/?appName=Naufrage").await
-        {
+        let config = config.unwrap_or_default();
+        if let Ok(client_options) = ClientOptions::parse(&config.url).await {
             if let Ok(client) = Client::with_options(client_options) {
                 if MONGO
                     .set(MongoClient {
-                        _database: client.database("Naufrage"),
+                        _database: client.database(&config.db_name),
                     })
                     .is_ok()
                 {

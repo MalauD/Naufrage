@@ -116,7 +116,6 @@ export default function DashboardContent(props) {
     const logout = () => {
         axios.post("/User/Logout").then(() => window.location.replace("/"));
     };
-
     return (
         <ThemeProvider theme={mdTheme}>
             <Box sx={{ display: "flex" }}>

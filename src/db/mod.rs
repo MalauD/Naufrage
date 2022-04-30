@@ -4,7 +4,7 @@ mod order;
 mod user;
 
 pub use self::{
-    db_setup::{get_mongo, MongoClient, PaginationOptions},
+    db_setup::{get_mongo, MongoClient, MongoConfig, PaginationOptions},
     dose::*,
     order::*,
     user::*,

@@ -51,6 +51,7 @@ const groups = [
 ].sort();
 
 export default function Register() {
+    const [error, setError] = React.useState(undefined);
     const [BirthDate, setBirthDate] = React.useState(new Date(2003, 7, 21));
     const [group, groupChange] = React.useState("MP2I");
     const navigate = useNavigate();
@@ -58,6 +59,46 @@ export default function Register() {
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+        if (data.get("password") !== data.get("password-confirm")) {
+            setError({
+                type: "PASSWORD_MISMATCH",
+                message: "Les mots de passe ne correspondent pas",
+            });
+            return;
+        }
+        if (data.get("password").length < 8) {
+            setError({
+                type: "PASSWORD_TOO_SHORT",
+                message: "Le mot de passe doit contenir au moins 8 caractères",
+            });
+            return;
+        }
+
+        if (data.get("username").length < 2) {
+            setError({
+                type: "USERNAME_TOO_SHORT",
+                message:
+                    "Le nom d'utilisateur doit contenir au moins 2 caractères",
+            });
+            return;
+        }
+
+        if (data.get("first_name").length < 2) {
+            setError({
+                type: "FIRSTNAME_TOO_SHORT",
+                message: "Le prénom doit contenir au moins 2 caractères",
+            });
+            return;
+        }
+
+        if (data.get("last_name").length < 2) {
+            setError({
+                type: "LASTNAME_TOO_SHORT",
+                message: "Le nom doit contenir au moins 2 caractères",
+            });
+            return;
+        }
+
         axios
             .post("/User/Register", {
                 username: data.get("username"),
@@ -70,8 +111,28 @@ export default function Register() {
             .then((res) => {
                 if (res.data.success) {
                     navigate("/");
+                } else {
+                    setError({
+                        type: "USERNAMETAKEN",
+                        message: "Ce nom d'utilisateur est déjà pris",
+                    });
                 }
+            })
+            .catch(() => {
+                setError({
+                    type: "UNKNOWN",
+                    message: "Une erreur inconnue est survenue",
+                });
             });
+    };
+
+    const get_error_msg = (type) => {
+        if (error) {
+            if (error.type === type) {
+                return error.message;
+            }
+        }
+        return "";
     };
 
     return (
@@ -133,6 +194,15 @@ export default function Register() {
                                 name="username"
                                 autoComplete="username"
                                 autoFocus
+                                error={
+                                    error &&
+                                    (error.type === "USERNAMETAKEN" ||
+                                        error.type === "USERNAME_TOO_SHORT")
+                                }
+                                helperText={
+                                    get_error_msg("USERNAMETAKEN") +
+                                    get_error_msg("USERNAME_TOO_SHORT")
+                                }
                             />
                             <Grid container spacing={2}>
                                 <Grid item xs={6}>
@@ -145,6 +215,13 @@ export default function Register() {
                                         name="first_name"
                                         autoComplete="first_name"
                                         autoFocus
+                                        error={
+                                            error &&
+                                            error.type === "FIRSTNAME_TOO_SHORT"
+                                        }
+                                        helperText={get_error_msg(
+                                            "FIRSTNAME_TOO_SHORT"
+                                        )}
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
@@ -157,6 +234,13 @@ export default function Register() {
                                         name="last_name"
                                         autoComplete="last_name"
                                         autoFocus
+                                        error={
+                                            error &&
+                                            error.type === "LASTNAME_TOO_SHORT"
+                                        }
+                                        helperText={get_error_msg(
+                                            "LASTNAME_TOO_SHORT"
+                                        )}
                                     />
                                 </Grid>
                                 <Grid item xs={4}>
@@ -209,6 +293,29 @@ export default function Register() {
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
+                                error={
+                                    error &&
+                                    (error.type === "PASSWORD_MISMATCH" ||
+                                        error.type === "PASSWORD_TOO_SHORT")
+                                }
+                                helperText={
+                                    get_error_msg("PASSWORD_MISMATCH") +
+                                    get_error_msg("PASSWORD_TOO_SHORT")
+                                }
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password-confirm"
+                                label="Confirmer le mot de passe"
+                                type="password"
+                                id="password-confirm"
+                                autoComplete="current-password"
+                                error={
+                                    error && error.type === "PASSWORD_MISMATCH"
+                                }
+                                helperText={get_error_msg("PASSWORD_MISMATCH")}
                             />
                             <Button
                                 type="submit"
@@ -216,13 +323,13 @@ export default function Register() {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                Se connecter
+                                S'inscrire
                             </Button>
                             <Grid container>
                                 <Grid item>
                                     <Link to="/Connexion" variant="body2">
                                         {
-                                            "Vous n'avez pas encore de compte ? Faites en un dès maintenant"
+                                            "Vous avez déjà un compte ? Connectez-vous"
                                         }
                                     </Link>
                                 </Grid>

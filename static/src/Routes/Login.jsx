@@ -14,10 +14,12 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Background from "./../img/concert.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Alert } from "@mui/material";
 
 const theme = createTheme();
 
 export default function Login() {
+    const [error, setError] = React.useState(undefined);
     const navigate = useNavigate();
 
     const handleSubmit = (event) => {
@@ -31,7 +33,16 @@ export default function Login() {
             .then((res) => {
                 if (res.data.success) {
                     navigate("/");
+                } else {
+                    setError(
+                        "Connection impossible, avez-vous bien rempli les champs ?"
+                    );
                 }
+            })
+            .catch((err) => {
+                setError(
+                    "Connection impossible, avez-vous bien rempli les champs ?"
+                );
             });
     };
 
@@ -86,6 +97,7 @@ export default function Login() {
                             sx={{ mt: 1 }}
                         >
                             <TextField
+                                error={error !== undefined}
                                 margin="normal"
                                 required
                                 fullWidth
@@ -96,6 +108,7 @@ export default function Login() {
                                 autoFocus
                             />
                             <TextField
+                                error={error !== undefined}
                                 margin="normal"
                                 required
                                 fullWidth
@@ -105,6 +118,7 @@ export default function Login() {
                                 id="password"
                                 autoComplete="current-password"
                             />
+
                             <Button
                                 type="submit"
                                 fullWidth
@@ -113,6 +127,13 @@ export default function Login() {
                             >
                                 Se connecter
                             </Button>
+
+                            {error ? (
+                                <Alert sx={{ mb: 2 }} severity="error">
+                                    {error}
+                                </Alert>
+                            ) : null}
+
                             <Grid container>
                                 <Grid item>
                                     <Link to="/Inscription" variant="body2">

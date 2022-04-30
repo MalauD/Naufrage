@@ -27,7 +27,7 @@ pub async fn get_client_token() -> OrderResponse {
 }
 
 pub async fn create_order(user: User) -> OrderResponse {
-    let db = get_mongo().await;
+    let db = get_mongo(None).await;
     let paypal = get_paypal(None).await;
 
     let order = paypal
@@ -45,7 +45,7 @@ pub async fn create_order(user: User) -> OrderResponse {
 pub async fn capture_order(user: User, path: web::Path<String>) -> OrderResponse {
     let order_id = PaypalOrderId(path.into_inner());
 
-    let db = get_mongo().await;
+    let db = get_mongo(None).await;
     let paypal = get_paypal(None).await;
 
     let order = paypal.capture_payment(order_id).await?;

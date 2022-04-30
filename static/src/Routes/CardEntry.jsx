@@ -19,11 +19,16 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function CardEntry({ user }) {
+    const [error, setError] = React.useState(undefined);
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const data = new FormData(e.currentTarget);
+        if (data.get("barcode").length > 6) {
+            setError("Le code barre doit contenir au maximum 6 numéros");
+            return;
+        }
         const barcode = parseInt(data.get("barcode"));
         axios
             .post(`/User/Card?barcode_id=${barcode}`)
@@ -69,10 +74,8 @@ function CardEntry({ user }) {
                         type="number"
                         fullWidth
                         defaultValue={user.barcode_card_id}
-                        InputLabelProps={{
-                            maxLength: 6,
-                            minLength: 6,
-                        }}
+                        error={error !== undefined}
+                        helperText={error}
                     />
                     <Button
                         type="submit"
