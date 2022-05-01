@@ -275,7 +275,7 @@ export default function Register() {
                                             }
                                         >
                                             {groups.map((g) => (
-                                                <MenuItem value={g}>
+                                                <MenuItem key={g} value={g}>
                                                     {g}
                                                 </MenuItem>
                                             ))}

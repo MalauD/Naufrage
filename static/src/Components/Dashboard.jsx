@@ -14,6 +14,7 @@ import { IconButton, Step, StepButton, Stepper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LogoutIcon from "@mui/icons-material/Logout";
+import FaceIcon from "@mui/icons-material/Face";
 
 const drawerWidth = 240;
 
@@ -79,7 +80,7 @@ export default function DashboardContent(props) {
         setOpen(!open);
     };
 
-    const { currentStep, children } = props;
+    const { currentStep, children, noAdvance } = props;
 
     React.useEffect(() => {
         axios.get("/User/Me").then((res) => setUser(res.data.Account));
@@ -145,6 +146,13 @@ export default function DashboardContent(props) {
                         <IconButton
                             component="span"
                             color="inherit"
+                            onClick={() => navigate("/Profile")}
+                        >
+                            <FaceIcon />
+                        </IconButton>
+                        <IconButton
+                            component="span"
+                            color="inherit"
                             onClick={logout}
                         >
                             <LogoutIcon />
@@ -166,41 +174,46 @@ export default function DashboardContent(props) {
                     <Toolbar />
                     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                         <Grid container spacing={3}>
-                            <Grid item xs={12} md={8} lg={9}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        pb: 2,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                    }}
-                                >
-                                    <Title>Avancement de l'inscription</Title>
-                                    <Stepper
-                                        nonLinear
-                                        alternativeLabel
-                                        activeStep={currentStep}
+                            {noAdvance ? null : (
+                                <Grid item xs={12} md={8} lg={9}>
+                                    <Paper
+                                        sx={{
+                                            p: 2,
+                                            pb: 2,
+                                            display: "flex",
+                                            flexDirection: "column",
+                                        }}
                                     >
-                                        {steps.map((label, index) => (
-                                            <Step
-                                                key={label}
-                                                completed={
-                                                    getCompleted()[index]
-                                                }
-                                            >
-                                                <StepButton
-                                                    color="inherit"
-                                                    onClick={() =>
-                                                        onStepClick(index)
+                                        <Title>
+                                            Avancement de l'inscription
+                                        </Title>
+                                        <Stepper
+                                            nonLinear
+                                            alternativeLabel
+                                            activeStep={currentStep}
+                                        >
+                                            {steps.map((label, index) => (
+                                                <Step
+                                                    key={label}
+                                                    completed={
+                                                        getCompleted()[index]
                                                     }
                                                 >
-                                                    {label}
-                                                </StepButton>
-                                            </Step>
-                                        ))}
-                                    </Stepper>
-                                </Paper>
-                            </Grid>
+                                                    <StepButton
+                                                        color="inherit"
+                                                        onClick={() =>
+                                                            onStepClick(index)
+                                                        }
+                                                    >
+                                                        {label}
+                                                    </StepButton>
+                                                </Step>
+                                            ))}
+                                        </Stepper>
+                                    </Paper>
+                                </Grid>
+                            )}
+
                             {childrenWithProps}
                         </Grid>
                     </Container>

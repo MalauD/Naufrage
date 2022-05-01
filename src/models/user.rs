@@ -74,6 +74,7 @@ pub struct User {
     orders: Vec<String>,
     has_paid: bool,
     verified: bool,
+    admin: bool,
 }
 
 fn serialize_option_oid_hex<S>(x: &Option<ObjectId>, s: S) -> Result<S::Ok, S::Error>
@@ -128,6 +129,7 @@ impl User {
             orders: Vec::new(),
             has_paid: false,
             verified: false,
+            admin: false,
         }
     }
 
