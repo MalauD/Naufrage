@@ -21,7 +21,7 @@ function StatusTable({ user }) {
             name: "Enregistrement de la carte de lycée",
             status: user.barcode_card_id !== undefined,
         },
-        { name: "Paiment de l'entrée", status: user.has_paid },
+        { name: "Paiement de l'entrée", status: user.has_paid },
         {
             name: "Vérification du compte par les organisateurs",
             status: user.verified === true,
@@ -33,7 +33,7 @@ function StatusTable({ user }) {
             <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Tâche</TableCell>
+                        <TableCell>Etape</TableCell>
                         <TableCell align="right">Avancement</TableCell>
                     </TableRow>
                 </TableHead>

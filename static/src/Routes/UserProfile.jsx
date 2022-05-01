@@ -62,7 +62,7 @@ function UserProfile({ user }) {
                     flexDirection: "column",
                 }}
             >
-                <Title>Profile</Title>
+                <Title>Profil</Title>
                 <Card>
                     <CardHeader
                         avatar={
@@ -81,14 +81,14 @@ function UserProfile({ user }) {
                             color="text.secondary"
                             sx={{ mb: 2 }}
                         >
-                            Classe: {user.group}
+                            Classe : {user.group}
                             <br />
-                            Date de naissance:{" "}
+                            Date de naissance :{" "}
                             {new Date(
                                 parseInt(user.birth_date.$date.$numberLong)
                             ).toLocaleDateString("fr-FR")}
                             <br />
-                            Code barre: {user.barcode_card_id || "Aucun"}
+                            Code barre : {user.barcode_card_id || "Aucun"}
                         </Typography>
                         <Stack spacing={1} direction="row">
                             {user.has_paid ? (

@@ -114,7 +114,7 @@ export default function Register() {
                 } else {
                     setError({
                         type: "USERNAMETAKEN",
-                        message: "Ce nom d'utilisateur est déjà pris",
+                        message: "Ce nom d'utilisateur existe déjà",
                     });
                 }
             })

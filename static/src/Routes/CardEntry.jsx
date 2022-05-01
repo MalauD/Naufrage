@@ -45,7 +45,7 @@ function CardEntry({ user }) {
                     flexDirection: "column",
                 }}
             >
-                <Title>Enregister sa carte de lycée</Title>
+                <Title>Enregistrer sa carte de lycée</Title>
                 <Card>
                     <CardMedia
                         component="img"
@@ -55,7 +55,7 @@ function CardEntry({ user }) {
                     <CardContent>
                         <Typography variant="body2" color="text.secondary">
                             Le numéro de votre carte de lycée se trouve au dos
-                            de votre carte sous le code barre. Il est composé de
+                            de celle-ci sous le code barre. Il est composé de
                             six chiffres.
                         </Typography>
                     </CardContent>

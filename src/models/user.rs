@@ -156,6 +156,11 @@ impl User {
     pub fn birth_date(&self) -> DateTime<Utc> {
         self.birth_date
     }
+
+    /// Get the user's admin.
+    pub fn is_admin(&self) -> bool {
+        self.admin
+    }
 }
 
 impl FromRequest for User {

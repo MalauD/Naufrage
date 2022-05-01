@@ -1,11 +1,12 @@
 use crate::{
-    db::MongoClient,
+    db::{MongoClient, PaginationOptions},
     models::{Order, User},
     tools::UserError,
 };
 use bson::oid::ObjectId;
 use chrono::{Datelike, Utc};
-use mongodb::{bson::doc, error::Result};
+use futures::StreamExt;
+use mongodb::{bson::doc, error::Result, options::FindOptions};
 
 impl MongoClient {
     pub async fn get_user_by_username(&self, username: String) -> Result<Option<User>> {
@@ -96,6 +97,53 @@ impl MongoClient {
         coll.update_one(
             doc! {"_id": user.id()},
             doc! {"$set" :{"has_paid": new_state}},
+            None,
+        )
+        .await?;
+        Ok(())
+    }
+
+    pub async fn get_non_verified_users(&self, pagination: PaginationOptions) -> Result<Vec<User>> {
+        let coll = self._database.collection::<User>("User");
+        let find_option = FindOptions::builder()
+            .limit(pagination.get_max_results() as i64)
+            .skip(Some(
+                (pagination.get_page() * pagination.get_max_results()) as u64,
+            ))
+            .build();
+        let mut cursor = coll.find(doc! { "verified": false }, find_option).await?;
+        let mut result = Vec::<User>::with_capacity(pagination.get_max_results().max(20));
+        while let Some(value) = cursor.next().await {
+            if let Ok(res) = value {
+                result.push(res);
+            }
+        }
+        Ok(result)
+    }
+
+    pub async fn get_all_users(&self, pagination: PaginationOptions) -> Result<Vec<User>> {
+        let coll = self._database.collection::<User>("User");
+        let find_option = FindOptions::builder()
+            .limit(pagination.get_max_results() as i64)
+            .skip(Some(
+                (pagination.get_page() * pagination.get_max_results()) as u64,
+            ))
+            .build();
+        let mut cursor = coll.find(doc! {}, find_option).await?;
+        let mut result = Vec::<User>::with_capacity(pagination.get_max_results().max(20));
+        while let Some(value) = cursor.next().await {
+            if let Ok(res) = value {
+                result.push(res);
+            }
+        }
+        Ok(result)
+    }
+
+    pub async fn verify_user(&self, user: &User, verified: bool) -> Result<()> {
+        let coll = self._database.collection::<User>("User");
+        coll.update_one(
+            doc! {"_id": user.id()},
+            doc! {"$set" :{"verified": verified}},
             None,
         )
         .await?;

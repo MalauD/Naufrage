@@ -138,7 +138,7 @@ export default function Login() {
                                 <Grid item>
                                     <Link to="/Inscription" variant="body2">
                                         {
-                                            "Vous n'avez pas encore de compte ? Faites en un dès maintenant"
+                                            "Vous n'avez pas encore de compte ? Créez-en un dès maintenant"
                                         }
                                     </Link>
                                 </Grid>

@@ -11,6 +11,7 @@ import CardEntryDashBoard from "./Routes/CardEntry";
 import Checkout from "./Routes/Checkout";
 import Status from "./Routes/Status";
 import UserProfileDashboard from "./Routes/UserProfile";
+import AdminDashboard from "./Routes/Admin";
 
 Axios.defaults.withCredentials = true;
 
@@ -39,6 +40,10 @@ const App = () => (
                     element={
                         <ProtectedRoute component={UserProfileDashboard} />
                     }
+                />
+                <Route
+                    path="/Admin"
+                    element={<ProtectedRoute component={AdminDashboard} />}
                 />
                 <Route path="/Connexion" element={<Login />} />
                 <Route path="/Inscription" element={<Register />} />

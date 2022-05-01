@@ -14,7 +14,7 @@ use crate::{
     db::{get_mongo, MongoConfig},
     models::Sessions,
     paypal::{get_paypal, PaypalClientConfig},
-    routes::{config_dose, config_order},
+    routes::{config_admin, config_dose, config_order},
 };
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
@@ -74,6 +74,7 @@ async fn main() -> std::io::Result<()> {
             .configure(config_user)
             .configure(config_dose)
             .configure(config_order)
+            .configure(config_admin)
             .service(Files::new("/", "./static/dist/"))
     })
     .bind_openssl(format!("0.0.0.0:{}", port), builder)?

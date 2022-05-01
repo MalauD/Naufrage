@@ -19,9 +19,9 @@ import FaceIcon from "@mui/icons-material/Face";
 const drawerWidth = 240;
 
 const steps = [
-    "Enregister sa carte de lycée",
+    "Enregistrer sa carte de lycée",
     "Paiement",
-    "Verification du compte",
+    "Vérification du compte",
 ];
 
 const steps_url = ["/Carte", "/Paiment", "/Statut"];

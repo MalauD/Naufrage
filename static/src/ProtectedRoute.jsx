@@ -24,7 +24,10 @@ class ProtectedRoute extends React.Component {
         Axios.get("/User/Me")
             .then((res) => {
                 if (res.data.Account) {
-                    this.setState({ connected: true, gotResult: true });
+                    this.setState({
+                        connected: true,
+                        gotResult: true,
+                    });
                 } else {
                     this.setState({ gotResult: true });
                 }
@@ -33,7 +36,7 @@ class ProtectedRoute extends React.Component {
     };
 
     render() {
-        const { component: Component, ...props } = this.props;
+        const { component: Component, admin, ...props } = this.props;
         const { gotResult, connected } = this.state;
 
         return (
