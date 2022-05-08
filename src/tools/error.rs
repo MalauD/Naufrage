@@ -1,5 +1,4 @@
 use actix_web::{http::StatusCode, HttpResponse, HttpResponseBuilder, ResponseError};
-use log::info;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -32,6 +31,8 @@ pub enum DoseError {
     Unauthorized,
     #[error("DatabaseError: something went wrong with mongodb")]
     DatabaseError(#[from] mongodb::error::Error),
+    #[error("InvalidToken")]
+    InvalidToken,
 }
 
 impl ResponseError for DoseError {
@@ -39,6 +40,7 @@ impl ResponseError for DoseError {
         match *self {
             Self::Unauthorized => StatusCode::UNAUTHORIZED,
             Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            DoseError::InvalidToken => StatusCode::UNAUTHORIZED,
         }
     }
 

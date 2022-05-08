@@ -20,6 +20,7 @@ pub struct AppSettings {
     pub port: u16,
     pub cert: String,
     pub key: String,
+    pub token_secret: String,
 }
 
 impl AppSettings {

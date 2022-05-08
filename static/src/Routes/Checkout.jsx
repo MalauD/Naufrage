@@ -80,7 +80,7 @@ function ProductCard({ has_paid }) {
                         color="text.secondary"
                         component="div"
                     >
-                        Prix: 14€
+                        Prix: 15€
                     </Typography>
                 </CardContent>
                 <Box

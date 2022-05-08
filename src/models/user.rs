@@ -1,3 +1,4 @@
+use crate::db::get_mongo;
 use crate::tools::UserError;
 use actix_identity::Identity;
 use actix_web::{

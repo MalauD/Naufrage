@@ -13,7 +13,7 @@ pub fn config_dose(cfg: &mut web::ServiceConfig) {
 
 #[derive(Debug, Deserialize)]
 pub struct ReduceDoseQuery {
-    token: i32,
+    token: String,
 }
 
 pub async fn reduce_dose(
@@ -23,7 +23,10 @@ pub async fn reduce_dose(
 ) -> DoseResponse {
     let db = get_mongo(None).await;
     let (rfid_card_id, device_id) = path.into_inner();
-
+    let token = &query.token;
+    if token != &settings.token_secret {
+        return Err(DoseError::InvalidToken);
+    }
     let (user, is_allowed_to_drink) = db.is_able_to_drink(rfid_card_id, 2).await?;
 
     let dose_count = settings.max_dose;
@@ -31,7 +34,7 @@ pub async fn reduce_dose(
     if is_allowed_to_drink {
         let user = user.unwrap();
         db.drink_dose(&user, dose_count).await?;
-        db.save_dose(Dose::new(user.id().unwrap(), device_id, dose_count))
+        db.save_dose(Dose::new(user.id().unwrap(), device_id, 1))
             .await?;
         Ok(HttpResponse::Ok().finish())
     } else {

@@ -26,6 +26,8 @@ pub async fn get_non_verified(
     pagination: web::Query<PaginationOptions>,
 ) -> AdminResponse {
     let db = get_mongo(None).await;
+    let user = db.get_user(&user.id().unwrap()).await.unwrap().unwrap();
+
     if user.is_admin() {
         let users = db.get_non_verified_users(pagination.into_inner()).await?;
         Ok(HttpResponse::Ok().json(json!(users)))
@@ -36,6 +38,8 @@ pub async fn get_non_verified(
 
 pub async fn get_all_users(user: User, pagination: web::Query<PaginationOptions>) -> AdminResponse {
     let db = get_mongo(None).await;
+    let user = db.get_user(&user.id().unwrap()).await.unwrap().unwrap();
+
     if user.is_admin() {
         let users = db.get_all_users(pagination.into_inner()).await?;
         Ok(HttpResponse::Ok().json(json!(users)))
